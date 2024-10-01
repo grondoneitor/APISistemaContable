@@ -11,7 +11,7 @@ import java.io.Serializable;
 public class CategoriaDTO implements Serializable {
 
 
-    private Integer id;
+    private Integer ID_Categoria;
     private String Categoria;
 
 }

@@ -78,6 +78,7 @@ public class productoController {
                         .Estado(productoEntity.isEstado())
                         .Precio(productoEntity.getPrecio())
                         .Descripcion(productoEntity.getDescripcion())
+                        .Categoria(productoEntity.getCategoria().getID_Categoria())
                         .build();
 
                 return new ResponseEntity<>(
@@ -158,6 +159,7 @@ public class productoController {
                     .Estado(producto.isEstado())
                     .Precio(producto.getPrecio())
                     .Descripcion(producto.getDescripcion())
+                    .Categoria(producto.getCategoria().getID_Categoria())
                     .build();
 
             return new ResponseEntity<>(Response.builder()
@@ -186,14 +188,15 @@ public class productoController {
             for(ProductoEntity producto: productosEntity){
 
                 ProductoDTO  producctosDTO = ProductoDTO.builder()
-                   .Id(producto.getId())
-                   .Producto(producto.getProducto())
-                   .Stock(producto.getStock())
-                   .Stock_Min(producto.getStock_Min())
-                   .Estado(producto.isEstado())
-                   .Precio(producto.getPrecio())
-                   .Descripcion(producto.getDescripcion())
-                   .build();
+                        .Id(producto.getId())
+                        .Producto(producto.getProducto())
+                        .Stock(producto.getStock())
+                        .Stock_Min(producto.getStock_Min())
+                        .Estado(producto.isEstado())
+                        .Precio(producto.getPrecio())
+                        .Descripcion(producto.getDescripcion())
+                        .Categoria(producto.getCategoria().getID_Categoria())
+                        .build();
 
                 productosFinal.add(producctosDTO);
           }

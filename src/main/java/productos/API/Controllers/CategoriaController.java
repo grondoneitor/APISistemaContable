@@ -58,7 +58,7 @@ public class CategoriaController {
 
         Categoria categoriaFinal = null;
 
-        try {if(categoriaService.existsById(categoriaDTO.getId())){
+        try {if(categoriaService.existsById(categoriaDTO.getID_Categoria())){
 
             String nombreMayuscula = categoriaDTO.getCategoria().toUpperCase();
             categoriaDTO.setCategoria(nombreMayuscula);
@@ -96,7 +96,7 @@ public class CategoriaController {
     public ResponseEntity<?> deleteCategoria(@RequestBody CategoriaDTO categoriaDTO){
 
         try{
-            Categoria categoria = categoriaService.findById(categoriaDTO.getId());
+            Categoria categoria = categoriaService.findById(categoriaDTO.getID_Categoria());
             categoriaService.delete(categoria);
             return new ResponseEntity<>(Response
                     .builder()
@@ -130,7 +130,7 @@ public class CategoriaController {
             ArrayList<Categoria> listaCate = categoriaService.findByName(catMayus);
             ArrayList<CategoriaDTO> lista   = new ArrayList<>();
             for (Categoria cat: listaCate){
-                CategoriaDTO categoriaDTO = CategoriaDTO.builder().id(cat.getID_Categoria()).Categoria(cat.getCategoria()).build();
+                CategoriaDTO categoriaDTO = CategoriaDTO.builder().ID_Categoria(cat.getID_Categoria()).Categoria(cat.getCategoria()).build();
                 lista.add(categoriaDTO);
             }
             return new ResponseEntity<>(Response.builder().mensaje("Buscado con exito").object(lista).build(), HttpStatus.OK);
@@ -138,5 +138,49 @@ public class CategoriaController {
             return  new ResponseEntity<>(Response.builder().mensaje(ex.getMessage()).object(null).build(), HttpStatus.METHOD_NOT_ALLOWED);
         }
     }
+
+    @GetMapping("categoria/{id}")
+    public ResponseEntity<?> findById(@PathVariable Integer id) {
+        if (id <= 0) {
+            return new ResponseEntity<>(Response.builder()
+                    .mensaje("ID de categoría inválido")
+                    .object(null)
+                    .build(), HttpStatus.BAD_REQUEST);
+        }
+
+        try {
+            Categoria categoria = categoriaService.findById(id);
+
+            if (categoria == null) {
+                return new ResponseEntity<>(Response.builder()
+                        .mensaje("Categoría no encontrada")
+                        .object(null)
+                        .build(), HttpStatus.NOT_FOUND);
+            }
+
+            CategoriaDTO categoriaDTO = CategoriaDTO.builder()
+                    .ID_Categoria(categoria.getID_Categoria())
+                    .Categoria(categoria.getCategoria())
+                    .build();
+
+            return new ResponseEntity<>(Response.builder()
+                    .mensaje("Categoría encontrada con éxito")
+                    .object(categoriaDTO)
+                    .build(), HttpStatus.OK);
+        } catch (DataAccessException ex) {
+            return new ResponseEntity<>(Response.builder()
+                    .mensaje("Error al acceder a los datos: " + ex.getMessage())
+                    .object(null)
+                    .build(), HttpStatus.INTERNAL_SERVER_ERROR);
+        } catch (Exception ex) {
+            return new ResponseEntity<>(Response.builder()
+                    .mensaje("Error inesperado: " + ex.getMessage())
+                    .object(null)
+                    .build(), HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
+
+
 
 }
