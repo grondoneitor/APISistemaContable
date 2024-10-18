@@ -6,6 +6,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import productos.API.Model.DTO.ProductoDTO;
+import productos.API.Model.Entity.Categoria;
 import productos.API.Model.Entity.ProductoEntity;
 import productos.API.Model.Payload.Response;
 import productos.API.Service.IProductoService;
@@ -30,25 +31,34 @@ public class productoController {
         ProductoEntity productoEntityVer = null;
 
         try{
-
             productoDTO.setProducto(productoDTO.getProducto().toUpperCase());
-            productoEntityVer = productoService.save(productoDTO);
 
-            ProductoDTO producto = ProductoDTO.builder()
-                    .Id(productoEntityVer.getId())
-                    .Producto(productoEntityVer.getProducto())
-                    .Stock(productoEntityVer.getStock())
-                    .Stock_Min(productoEntityVer.getStock_Min())
-                    .Estado(productoEntityVer.isEstado())
-                    .Precio(productoEntityVer.getPrecio())
-                    .Descripcion(productoEntityVer.getDescripcion())
-                    .Categoria(productoEntityVer.getCategoria().getID_Categoria())
-                    .build();
 
-            return new ResponseEntity<>(Response.builder()
-                    .mensaje("Guardado con exito")
-                    .object(producto)
-                    .build(), HttpStatus.CREATED);
+           if(productoDTO.getProducto() != "" && productoDTO.getPrecio() != null && productoDTO.getStock() != null) {
+               productoEntityVer = productoService.save(productoDTO);
+
+               Categoria categoria = productoEntityVer.getCategoria();
+               ProductoDTO producto = ProductoDTO.builder()
+                       .Id(productoEntityVer.getId())
+                       .Producto(productoEntityVer.getProducto())
+                       .Stock(productoEntityVer.getStock())
+                       .Stock_Min(productoEntityVer.getStock_Min())
+                       .Estado(productoEntityVer.isEstado())
+                       .Precio(productoEntityVer.getPrecio())
+                       .Descripcion(productoEntityVer.getDescripcion())
+                       .Categoria(categoria != null ? categoria.getID_Categoria() : null)
+                       .build();
+
+               return new ResponseEntity<>(Response.builder()
+                       .mensaje("Guardado con exito")
+                       .object(producto)
+                       .build(), HttpStatus.CREATED);
+           }else{
+               return new ResponseEntity<>(Response.builder()
+                       .mensaje("Hay campos obligatorios vacios")
+                       .object(null)
+                       .build(), HttpStatus.NOT_FOUND);
+           }
         }catch (DataAccessException dtx){
 
             return new ResponseEntity<>(
@@ -67,26 +77,36 @@ public class productoController {
     public ResponseEntity<?> update(@RequestBody ProductoDTO productoDTO, @PathVariable Integer id) {
         try {
             if (productoService.existProById(id)) {
-                productoDTO.setProducto(productoDTO.getProducto().toUpperCase());
-                productoDTO.setId(id);
-                ProductoEntity productoEntity = productoService.save(productoDTO);
-                ProductoDTO producto = ProductoDTO.builder()
-                        .Id(productoEntity.getId())
-                        .Producto(productoEntity.getProducto())
-                        .Stock(productoEntity.getStock())
-                        .Stock_Min(productoEntity.getStock_Min())
-                        .Estado(productoEntity.isEstado())
-                        .Precio(productoEntity.getPrecio())
-                        .Descripcion(productoEntity.getDescripcion())
-                        .Categoria(productoEntity.getCategoria().getID_Categoria())
-                        .build();
+                if(productoDTO.getProducto() != ""  && productoDTO.getPrecio() != null && productoDTO.getStock() != null ) {
+                    productoDTO.setProducto(productoDTO.getProducto().toUpperCase());
+                    productoDTO.setId(id);
+                    ProductoEntity productoEntity = productoService.save(productoDTO);
+                    Categoria categoria = productoEntity.getCategoria();
+                    ProductoDTO producto = ProductoDTO.builder()
+                            .Id(productoEntity.getId())
+                            .Producto(productoEntity.getProducto())
+                            .Stock(productoEntity.getStock())
+                            .Stock_Min(productoEntity.getStock_Min())
+                            .Estado(productoEntity.isEstado())
+                            .Precio(productoEntity.getPrecio())
+                            .Descripcion(productoEntity.getDescripcion())
+                            .Categoria(categoria != null ? categoria.getID_Categoria() : null )
+                            .build();
 
-                return new ResponseEntity<>(
-                        Response.builder()
-                                .mensaje("Actualizado con éxito")
-                                .object(producto)
-                                .build(),
-                        HttpStatus.OK);
+                    return new ResponseEntity<>(
+                            Response.builder()
+                                    .mensaje("Actualizado con éxito")
+                                    .object(producto)
+                                    .build(),
+                            HttpStatus.OK);
+                } else{
+                    return new ResponseEntity<>(
+                            Response.builder()
+                                    .mensaje("Hay campos obligatorios vacios")
+                                    .object(null)
+                                    .build(),
+                            HttpStatus.NOT_FOUND);
+                }
             } else {
                 return new ResponseEntity<>(
                         Response.builder()
@@ -151,6 +171,7 @@ public class productoController {
 
         try{
             producto = productoService.findProById(id);
+            Categoria categoria = producto.getCategoria();
             ProductoDTO productoDTO = ProductoDTO.builder()
                     .Id(producto.getId())
                     .Producto(producto.getProducto())
@@ -159,7 +180,7 @@ public class productoController {
                     .Estado(producto.isEstado())
                     .Precio(producto.getPrecio())
                     .Descripcion(producto.getDescripcion())
-                    .Categoria(producto.getCategoria().getID_Categoria())
+                    .Categoria(categoria != null ? categoria.getID_Categoria() : null)
                     .build();
 
             return new ResponseEntity<>(Response.builder()

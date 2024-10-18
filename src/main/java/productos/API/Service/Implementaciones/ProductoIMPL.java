@@ -26,8 +26,11 @@ public class ProductoIMPL implements IProductoService {
     @Override
     public ProductoEntity save(ProductoDTO productoDTO) {
 
-        Categoria categoria = categoriaDAO.findById(productoDTO.getCategoria()).orElseThrow(() -> new EntityNotFoundException("Categoría no encontrada"));
+        Categoria categoria = null;
 
+        if(productoDTO.getCategoria() != null) {
+             categoria = categoriaDAO.findById(productoDTO.getCategoria()).orElse(null);
+        }
        ProductoEntity productoEntity = ProductoEntity.builder()
                .Id(productoDTO.getId())
                .Producto(productoDTO.getProducto())

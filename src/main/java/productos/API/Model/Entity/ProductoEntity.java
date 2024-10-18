@@ -40,6 +40,6 @@ public class ProductoEntity implements Serializable {
     private String Descripcion;
 
     @ManyToOne
-    @JoinColumn(name = "ID_Categoria")
+    @JoinColumn(name = "ID_Categoria", nullable = true)
     private Categoria Categoria;
 }
